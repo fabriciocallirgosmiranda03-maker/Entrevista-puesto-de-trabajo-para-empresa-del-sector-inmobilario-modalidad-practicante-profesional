@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrevista Importante</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#fff8e7,#ffe4ec);
+  overflow:hidden;
+  font-family:'Montserrat',sans-serif;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle,rgba(255,215,0,0.15)10%,transparent 60%);
+  animation:glow 12s linear infinite;
+}
+@keyframes glow{
+  0%{transform:translate(-25%,-25%) rotate(0deg);}
+  100%{transform:translate(-25%,-25%) rotate(360deg);}
+}
+
+.envelope{
+  position:relative;
+  width:460px;
+  height:300px;
+  background:white;
+  border-radius:15px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.25);
+  cursor:pointer;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.envelope p{
+  position:relative;
+  z-index:3;
+  font-size:20px;
+}
+
+.flap{
+  position:absolute;
+  top:0;
+  width:100%;
+  height:100%;
+  background:#f8d7da;
+  clip-path:polygon(0 0,50% 55%,100% 0);
+  transform-origin:top;
+  transition:1s;
+  z-index:2;
+}
+
+.open .flap{
+  transform:rotateX(180deg);
+}
+
+.letter{
+  position:absolute;
+  width:600px;
+  height:700px;
+  background:white;
+  border-radius:25px;
+  padding:40px;
+  box-shadow:0 20px 45px rgba(0,0,0,0.35);
+  text-align:center;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,120%);
+  opacity:0;
+  transition:1s;
+  z-index:1;
+}
+
+.letter.show{
+  transform:translate(-50%,-50%);
+  opacity:1;
+}
+
+h1{
+  font-family:'Playfair Display',serif;
+  font-size:36px;
+  color:#d63384;
+}
+
+button{
+  padding:28px 50px; /* MÁS GRANDES */
+  margin:20px;
+  font-size:26px; /* MÁS GRANDE */
+  border:none;
+  border-radius:35px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+#yesBtn{
+  background:#ff4d6d;
+  color:white;
+}
+
+#noBtn{
+  background:#6c757d;
+  color:white;
+}
+
+.preview-img{
+  width:160px;  /* FOTO PEQUEÑA */
+  border-radius:15px;
+  margin-bottom:25px;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(100vh);
+    opacity:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<audio autoplay loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<div class="envelope" id="sobre">
+  <p id="tocaTexto">💌 Abreme</p>
+  <div class="flap"></div>
+</div>
+
+<div class="letter" id="carta">
+  <h1 id="pregunta">¿Quieres ser el San Valentín de este gordito que te ama mucho? ❤️</h1>
+  <p id="subtexto">Di que si🥹</p>
+
+  <!-- FOTO ARRIBA DE LOS BOTONES -->
+  <img src="losdos.jpeg" class="preview-img">
+
+  <div id="buttons">
+    <button id="yesBtn">Sí 💘</button>
+    <button id="noBtn">No 😡</button>
+  </div>
+
+  <div id="respuesta"></div>
+</div>
+
+<script>
+let noScale=1;
+let yesScale=1;
+let noClicks=0;
+
+const sobre=document.getElementById("sobre");
+const carta=document.getElementById("carta");
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
+const tocaTexto=document.getElementById("tocaTexto");
+
+const frasesNo=[
+"¿Que?🥺",
+"¿A pero esto es enserio?",
+"Creo que te confundiste, ¿eh?",
+"Ah, pero qué insistente me saliste 😅",
+"¿Vas a ser así? 😢",
+"Prometo besos ilimitados 😘",
+"¿Y si lo piensas un poquitito?🥹",
+"No creo que te hayas equivocado tantas veces…",
+"Yo creo que el botón “Sí” te queda mejor 😉",
+"Mira que si le das al “Sí” te voy a dar muchos besitos 😘",
+"¿De verdad estás segura de esto? 😭",
+"Piénsalo con el corazoncito ❤️",
+"Ah… mejor di que me odias 😔",
+"Ah, y sigues todavía…",
+"Le voy a pedir a Diosito que digas que sí 🙏",
+"Mira que te estoy observando, ¿eh? 👀 Y Cupido también 🏹",
+"Voy a ponerte cámaras en tu casa si sigues así 😳",
+"¿Y si mejor le das al otro botón, mi amorcito?",
+"Que el “Sí” no te va a hacer nada, ¿eh?",
+"Por poner “Sí” no te vamos a cobrar 😌",
+"¡Asuu! Ya pues…",
+"¡Asu mare! ¡Dios mío, qué es estooooooooooooooooo!",
+"¿Por qué no le das al “Sí”?",
+"No seas mala conmigo 😭",
+"Mira que el “Sí” ya está creciendo bastante 👀",
+"Ah, pero tú no paras…",
+"Bueno, yo también voy a insistir ",
+"¿Y si mejor le das al “Sí”? ¿No crees que acabaría más rápido?",
+"¿Y si lo intentas otra vez… pero al “Sí”?",
+"Ya pues, a ver… dale al “Sí”.",
+"Ya pues, amor, no seas así 🥺",
+"¿Qué es lo que pasa acá?",
+"¿Esto es una broma?",
+"Ya pues, amor, deja de bromear 😭",
+"Mira, amor, que me estoy molestando 😠",
+"Amor… ya pues 😭",
+"Asu… ¿de verdad esto va a ser así?",
+"Para que acabe esto más rápido, dale al “Sí”.",
+"Vamos, amor, dale al “Sí”.",
+"Por favor… mira que confío en ti.",
+"Por favor, amor, elige bien 🥺",
+"Mira que el “Sí” no va a parar de crecer 😳",
+"El “No” ya no sabe dónde esconderse…",
+"Creo que mejor no lo hagas 😡",
+"De verdad esto se va a salir de control…",
+"No me eches la culpa por lo que voy a hacer 😈",
+"Mira… mira lo que estás ocasionando 👀",
+"Bueno… ya no quedó de otra 😌"
+];
+let fraseIndex=0;
+
+sobre.addEventListener("click",function(){
+  sobre.classList.add("open");
+  tocaTexto.style.display="none";
+  setTimeout(()=>{
+    carta.classList.add("show");
+  },600);
+});
+
+noBtn.addEventListener("click",function(){
+
+  noClicks++;
+
+  if(noScale>0.4) noScale-=0.05;
+  if(yesScale<100) yesScale+=0.08;
+
+  noBtn.style.transform=`scale(${noScale})`;
+  yesBtn.style.transform=`scale(${yesScale})`;
+
+  noBtn.textContent=frasesNo[fraseIndex];
+  fraseIndex=(fraseIndex+1)%frasesNo.length;
+
+  noBtn.style.position="absolute";
+  noBtn.style.left=Math.random()*350+"px";
+  noBtn.style.top=Math.random()*350+"px";
+
+  if(noClicks>=50){
+    noBtn.style.display="none";
+    yesBtn.style.position="fixed";
+    yesBtn.style.top="0";
+    yesBtn.style.left="0";
+    yesBtn.style.width="100vw";
+    yesBtn.style.height="100vh";
+    yesBtn.style.fontSize="60px";
+  }
+});
+
+yesBtn.addEventListener("click",function(){
+
+  /* BORRAR PREGUNTA Y TEXTO */
+  document.getElementById("pregunta").style.display="none";
+  document.getElementById("subtexto").style.display="none";
+  document.querySelector(".preview-img").style.display="none";
+  document.getElementById("buttons").style.display="none";
+
+  document.getElementById("respuesta").innerHTML=`
+    <h2 style="color:#d63384;font-size:30px;">Sabía que dirías que sí a la primera mi amorcito 💖</h2>
+    <p style="font-size:18px;">Porque cada momento contigo es unico, especial e inolvidable, por este San Valentin y por los todos los que vienen junto a tu lado.</p>
+    <img src="nosotros.jpeg" style="width:400px;border-radius:20px;margin-top:20px;">
+    <p style="font-size:18px;">Porque te amo, te quiero y te extraño todos los días de mi vida.❤️❤️❤️</p>
+  `;
+
+  lanzarCorazones();
+});
+
+function lanzarCorazones(){
+  setInterval(()=>{
+    const heart=document.createElement("div");
+    heart.innerHTML="❤️";
+    heart.style.position="fixed";
+    heart.style.left=Math.random()*100+"vw";
+    heart.style.top="-20px";
+    heart.style.fontSize="25px";
+    heart.style.animation="fall 4s linear forwards";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),4000);
+  },200);
+}
+</script>
+
+</body>
+</html>
